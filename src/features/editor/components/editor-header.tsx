@@ -19,12 +19,13 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { SaveIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useAtomValue } from "jotai";
-import { editorAtom } from "../store/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { editorAtom, executionResetAtom } from "../store/atoms";
 
 export const EditorSaveButton = ({ workflowId }: { workflowId: string }) => {
   const editor = useAtomValue(editorAtom);
   const saveWorkflow = useUpdateWorkflow();
+  const resetNodeStatuses = useSetAtom(executionResetAtom);
 
   const handleSave = () => {
     if (!editor) {
@@ -34,6 +35,7 @@ export const EditorSaveButton = ({ workflowId }: { workflowId: string }) => {
     const nodes = editor.getNodes();
     const edges = editor.getEdges();
 
+    resetNodeStatuses((c) => c + 1);
     saveWorkflow.mutate({
       id: workflowId,
       nodes,
